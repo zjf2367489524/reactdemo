@@ -31,7 +31,9 @@ class TodoList extends React.Component {
             list: [...prevState.list, $newVal],
             input: '',
             isRepeat: false
-        }))
+        }), () => {
+            console.log(this.state.list)
+        })
         e.target.previousElementSibling.focus()
     }
     handleDeleteListItem = (e) => {
@@ -86,7 +88,9 @@ class TodoList extends React.Component {
                                 <div className="tdl-list-empty">empty</div>
                         }
                     </ul>
-                    <div className="tdl-view"></div>
+                    <div className="tdl-view">
+                        <TodoListView />
+                    </div>
                 </div>
                 <div className="tdl-tip">
                     <TodoListTip>

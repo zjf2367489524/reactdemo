@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class TodoListItem extends React.Component {
     render() {
@@ -9,6 +10,18 @@ class TodoListItem extends React.Component {
             </li>
         )
     }
+}
+
+TodoListItem.propTypes = {
+    value: PropTypes.oneOfType([
+        PropTypes.string.isRequired,
+        PropTypes.number.isRequired
+    ]),
+    onDelete: PropTypes.func
+}
+
+TodoListItem.defaultProps = {
+    value: 'index'
 }
 
 export default TodoListItem
