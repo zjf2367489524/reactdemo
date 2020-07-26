@@ -9,7 +9,8 @@ class TodoList extends React.Component {
         this.state = {
             list: [],
             input: '',
-            isRepeat: false
+            isRepeat: false,
+            active: -1
         }
         this.inputDom = React.createRef()
     }
@@ -47,6 +48,14 @@ class TodoList extends React.Component {
             }
         })
     }
+    handleChangeActiveItem = (e) => {
+        if (e.target.tagName === 'BUTTON') return
+        const $active = this.state.list.indexOf(e.target.dataset.value)
+        const $newActive = $active === this.state.active ? this.state.active : $active
+        this.setState(() => ({
+              active: $newActive
+        }))
+    }
     toHideTip = (e) => {
         this.setState(() => ({
             isRepeat: false
@@ -59,6 +68,7 @@ class TodoList extends React.Component {
         const $input = this.state.input
         const $list = this.state.list
         const $isRepeat = this.state.isRepeat
+        const $active = this.state.active
         return (
             <div className="tdl-wrap">
                 <div className="tdl-add">
@@ -81,15 +91,15 @@ class TodoList extends React.Component {
                         {
                             $list.length
                                 ?
-                                $list.map((item) =>
-                                    <TodoListItem key={item} value={item} onDelete={this.handleDeleteListItem}></TodoListItem>
+                                $list.map((item) => 
+                                    <TodoListItem key={item} value={item} onDelete={this.handleDeleteListItem} onActive={this.handleChangeActiveItem}></TodoListItem>
                                 )
                                 :
                                 <div className="tdl-list-empty">empty</div>
                         }
                     </ul>
                     <div className="tdl-view">
-                        <TodoListView />
+                        <TodoListView activeIndex={$active} activeVal={$list[$active]} />
                     </div>
                 </div>
                 <div className="tdl-tip">
