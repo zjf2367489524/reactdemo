@@ -1,12 +1,12 @@
 .tdl-add{
     background-color: aqua;
-    padding: .5em 0 .5em 10%;
+    padding: 1em;
     box-shadow: 0 0 9px 3px #00aaff;
 }
 .tdl-main{
     display: flex;
     padding: 1em;
-    height: 400px;
+    height: 512px;
 }
 .tdl-list{
     width: 256px;
@@ -15,21 +15,18 @@
     background-color: #f0f0f0;
     padding: 0;
 }
-.tdl-list-empty{
-    height: 100%;
+.tdl-list.empty{
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #aaaaaa;
-    font-size: 2em;
 }
-.tdl-list>li{
+.tdl-list li{
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: .5em;
 }
-.tdl-list>li+li{
+.tdl-list li+li{
     border-top: 1px solid #cccccc;
 }
 .tdl-list button{
@@ -49,4 +46,24 @@
     padding-left: 5%;
     background-color: #ff6600;
     border-radius: 4px;
+}
+.fade-enter, .fade-appear{
+    opacity: 0;
+}
+.fade-enter-done{
+    opacity: 1;
+}
+.fade-enter-active, .fade-appear-active{
+    opacity: 1;
+    transition: opacity 1s ease-in;
+}
+.fade-exit{
+    opacity: 1;
+}
+.fade-exit-active{
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+.fade-exit-done{
+    opacity: 0;
 }

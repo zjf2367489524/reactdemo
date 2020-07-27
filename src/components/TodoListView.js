@@ -1,21 +1,27 @@
 import React from 'react'
+import store from '../store'
 
 class TodoListView extends React.Component {
-    componentWillMount() {}
-    componentDidMount() {}
-    componentWillReceiveProps() {}
-    shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.activeIndex != nextProps.activeIndex) return true
-        return false
+    constructor (props) {
+        super(props)
+        this.state = store.getState()
+        store.subscribe(this.handleStoreChange)
     }
-    componentWillUpdate() {}
-    componentDidUpdate() {}
-    componentWillUnmount() {}
+    handleStoreChange = () => {
+        this.setState((prevState) => {
+            return store.getState()
+        }, () => {})
+    }
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.state.activeListItem === nextState.activeListItem) return false
+        return true
+    }
     render() {
-        console.log('render')
+        const $list = this.state.list
+        const $activeListItem = this.state.activeListItem
         return (
             <React.Fragment>
-                <span>index: {this.props.activeIndex} / val: {this.props.activeVal}</span>
+                <div>{$list[$activeListItem]}</div>
             </React.Fragment>
         )
     }
