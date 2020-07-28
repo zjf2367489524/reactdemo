@@ -17,13 +17,10 @@ const TodoListItem = (props) => {
                                     timeout = {500}
                                     classNames = 'fade'
                                     unmountOnExit
-                                    onEnter = {(el) => {
-                                        // el.style.color = '#FF0000'
-                                    }}
                                     appear = {true}
                                     key = {item}>
                                     <li data-value={item}>
-                                        <span dangerouslySetInnerHTML={{__html: item}}></span>
+                                        <span>{item}</span>
                                         <button onClick={props.onDelete}>Delete</button>
                                     </li>
                                 </CSSTransition>

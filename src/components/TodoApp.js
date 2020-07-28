@@ -2,106 +2,116 @@ import React from 'react'
 import TodoList from './TodoList'
 import TodoListView from './TodoListView'
 import { Input, Button, Alert } from 'antd'
-import store from '../store'
-import { getChangeInpuValAction, getInputToRepeatAction, getAddListItemAction, getDeleteListItemAction, getChangeActiveListItemAction, getHideRepeatTipAction,  getInitListThunkAction } from '../store/actionCreators'
-//import Axios from 'axios'
+import { 
+    getChangeInpuValAction, 
+    getAddListItemAction, 
+    getDeleteListItemAction, 
+    getChangeActiveListItemAction,  
+    getInitListSagaAction,
+    getHeaderInputChangeValAction,
+    getHeaderInputRepeatAction,
+    getHeaderInputFoucsAction
+} from '../store/actionCreators'
+import { connect } from 'react-redux'
+import { TDLHeaderWrapper, TDLMain, TDLRepeatTip } from './style'
 
 class TodoApp extends React.Component {
     constructor(props) {
         super(props)
-        this.state = store.getState()
         this.inputDom = React.createRef()
-        store.subscribe(this.handleStoreChange)
     }
-    handleStoreChange = () => {
-        this.setState((prevState) => {
-            return store.getState()
-        }, () => {})
-    }
-    handleInputChange = (e) => {
-        const $action = getChangeInpuValAction(e.target.value)
-        store.dispatch($action)
+    handleInputChangeVal = (e) => {
+        this.props.headerInputChangeVal(e.target.value)
     }
     handleAddListItem = (e) => {
-        const $prevState = this.state
-        const $newVal = $prevState.inputVal
-        let $action
-        if (!$newVal.length) {
-            alert('can not empty')
+        const $newVal = this.props.header.inputVal
+        if (!$newVal.length) return
+        if (this.props.global.list.includes($newVal)) {
+            this.props.headerInputRepeat(true)
             return
         }
-        if (this.state.list.includes($newVal)) {
-            $action = getInputToRepeatAction()
-            store.dispatch($action)
-            return
-        }
-        $action = getAddListItemAction()
-        store.dispatch($action)
+        this.props.addListItemAction($newVal)
+        this.props.headerInputChangeVal('')
+        this.props.headerInputRepeat(false)
         this.inputDom.current.focus()
     }
     handleDeleteListItem = (e) => {
         e.stopPropagation()
-        const $target = e.target.parentElement.dataset.value
-        const $action = getDeleteListItemAction($target)
-        store.dispatch($action)
+        this.props.deleteListItemAction(e.target.parentElement.dataset.value)
     }
     handleChangeActiveItem = (e) => {
         if (e.target.tagName === 'LI') {
-            const $active = this.state.list.indexOf(e.target.dataset.value)
-            const $newActive = $active === this.state.active ? this.state.activeListItem : $active
-            const $action = getChangeActiveListItemAction($newActive)
-            store.dispatch($action)
+            const $state = this.props.global
+            const $active = $state.list.indexOf(e.target.dataset.value)
+            const $newActive = $active === $state.active ? $state.activeListItem : $active
+            this.props.changeActiveItemAction($newActive)
         }
-    }
-    handleHideTip = () => {
-        console.log('1')
-        const $action = getHideRepeatTipAction()
-        store.dispatch($action)
     }
     componentDidMount() {
         this.inputDom.current.focus()
-        // Axios.get('/list.json').then((res) => {}).catch((err) => {console.log(new Error(err))}).finally(() => {
-        //     setTimeout(() => {
-        //         const $action = getInitListAction(["lty"])
-        //         store.dispatch($action)
-        //     }, 10)
-        // })
-        // thunk
-        const $action = getInitListThunkAction()
-        store.dispatch($action)
-        // saga
-        // const $action = getInitListSagaAction()
-        // store.dispatch($action)
+        this.props.initListAction()
     }
     render() {
-        const $inputVal = this.state.inputVal
-        const $list = this.state.list
-        const $isInputRepeat = this.state.isInputRepeat
         return (
-            <div className="tdl-wrap">
-                <div className="tdl-add">
+            <div>
+                <TDLHeaderWrapper>
                     <Input 
-                        placeholder="input any here..." 
-                        style={{width: 256}}
+                        placeholder="input any here..."
+                        className={["tdl-input", this.props.header.inputFoucs ? 'active' : null].join(' ')}
+                        onFocus={this.props.headerInputFoucs}
+                        onBlur={this.props.headerInputFoucs}
                         ref={this.inputDom}
-                        value={$inputVal}
-                        onChange={this.handleInputChange}>    
+                        value={this.props.header.inputVal}
+                        onChange={this.handleInputChangeVal}>    
                     </Input>
                     <Button type="primary" onClick={this.handleAddListItem}>add</Button>
-                </div>
-                <div className="tdl-main">
-                    <TodoList list={$list} onDelete={this.handleDeleteListItem} onActive={this.handleChangeActiveItem}></TodoList>
+                </TDLHeaderWrapper>
+                <TDLMain>
+                    <TodoList list={this.props.global.list} onDelete={this.handleDeleteListItem} onActive={this.handleChangeActiveItem}></TodoList>
                     <TodoListView></TodoListView>
-                </div>
-                <div className="tdl-tip">
-                    {
-                        $isInputRepeat &&
-                        <Alert message="new item is repeat" type="warning" showIcon closable onClose={this.handleHideTip} />
-                    }
-                </div>
+                </TDLMain>
+                <TDLRepeatTip>
+                    { this.props.header.inputRepeat && <Alert message="new item is repeat" type="warning" showIcon /> }
+                </TDLRepeatTip>
             </div>
         )
     }
 }
 
-export default TodoApp
+function mapStateToProps(state) {
+    return { global: state.global, header: state.header }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        initListAction: function () {
+            // thunk
+            // dispatch(getInitListThunkAction())
+            // saga
+            dispatch(getInitListSagaAction())
+        },
+        inputChangeValAction: function (val) {
+            dispatch(getChangeInpuValAction(val))
+        },
+        addListItemAction: function (val) {
+            dispatch(getAddListItemAction(val))
+        },
+        deleteListItemAction: function (val) {
+            dispatch(getDeleteListItemAction(val))
+        },
+        changeActiveItemAction: function (val) {
+            dispatch(getChangeActiveListItemAction(val))
+        },
+        headerInputChangeVal: function (val) {
+            dispatch(getHeaderInputChangeValAction(val))
+        },
+        headerInputRepeat: function (val) {
+            dispatch(getHeaderInputRepeatAction(val))
+        },
+        headerInputFoucs: function () {
+            dispatch(getHeaderInputFoucsAction())
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TodoApp)
