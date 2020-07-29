@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'
 import headerReducer from '../components/headerReducer'
+import fileReducer from '../components/fileReducer'
 
 const defaultReducer = {
     list: [],
@@ -29,5 +30,6 @@ const globalReducer = (state = defaultReducer, action) => {
 
 export default combineReducers({
     global: globalReducer,
-    header: headerReducer
+    header: headerReducer,
+    file: fileReducer
 })

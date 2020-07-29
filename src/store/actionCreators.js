@@ -57,3 +57,9 @@ export const getInitListAction = (list) => ({
 export const getInitListSagaAction = () => ({
     type: 'initListSaga'
 })
+export const getFileResAction = () => ({
+    type: 'fetchFile'
+})
+export const getAddFileResAction = () => ({
+    type: 'addFileRes'
+})
